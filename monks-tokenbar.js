@@ -1,4 +1,4 @@
-﻿import { registerSettings, divideXpOptions } from "./settings.js";
+import { registerSettings, divideXpOptions } from "./settings.js";
 import { TokenBar } from "./apps/tokenbar.js";
 import { AssignXP, AssignXPApp } from "./apps/assignxp.js";
 import { SavingThrow, SavingThrowApp } from "./apps/savingthrow.js";
@@ -111,6 +111,17 @@ export class MonksTokenBar {
             .replace(/-+/g, '-');
 
         return str;
+    }
+
+    /**
+     * @param {(Roll|Roll[]|Object)} roll 
+     */
+    static intoRoll(roll) {
+        if (roll instanceof Roll) {
+            return roll;
+        }
+
+        return Roll.fromData(roll);
     }
 
     static init() {
@@ -481,10 +492,7 @@ export class MonksTokenBar {
                     let message = game.messages.get(data.msgid);
                     const revealDice = MonksTokenBar.revealDice();
                     for (let response of data.response) {
-                        if (response.roll) {
-                            let r = Roll.fromData(response.roll);
-                            response.roll = r;
-                        }
+                        response.roll = MonksTokenBar.intoRoll(response.roll);
                     }
                     if (data.type == 'savingthrow')
                         SavingThrow.updateMessage(data.response, message, revealDice);
